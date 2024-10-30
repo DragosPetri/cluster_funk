@@ -12,9 +12,9 @@
 #include <span>
 #include <vector>
 
-#include "algebra/algebra.h"
-#include "data_objects/aliases.h"
-#include "kmeans/kmeans.h"
+#include "algebra/algebra.hpp"
+#include "data_objects/aliases.hpp"
+#include "kmeans/kmeans.hpp"
 
 namespace cf::gmm {
 

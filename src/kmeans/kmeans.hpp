@@ -9,7 +9,7 @@
 #include <ranges>
 #include <vector>
 
-#include "data_objects/aliases.h"
+#include "data_objects/aliases.hpp"
 
 namespace cf::kmeans {
 

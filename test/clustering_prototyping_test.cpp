@@ -5,10 +5,10 @@
 #include <vector>
 
 #include "acutest/acutest.h"
-#include "algebra/algebra.h"
-#include "data_objects/aliases.h"
-#include "epsilon.h"
-#include "gmm_em/gmm_em.h"
+#include "algebra/algebra.hpp"
+#include "data_objects/aliases.hpp"
+#include "epsilon.hpp"
+#include "gmm_em/gmm_em.hpp"
 
 using namespace cf;
 

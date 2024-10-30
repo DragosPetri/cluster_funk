@@ -9,9 +9,9 @@
 
 #include "args.hxx"
 #include "csvcpp/csvcpp.h"
-#include "data_objects/aliases.h"
-#include "gmm_em/gmm_em.h"
-#include "kmeans/kmeans.h"
+#include "data_objects/aliases.hpp"
+#include "gmm_em/gmm_em.hpp"
+#include "kmeans/kmeans.hpp"
 
 namespace fs = std::filesystem;
 
@@ -23,11 +23,8 @@ using std::chrono::milliseconds;
 constexpr std::uint8_t NR_COMPONENTS = 5;
 constexpr std::uint8_t NR_FEATURES = 2;
 
-void save_labeled_data(
-    const Data<NR_FEATURES> &data,
-    const std::vector<std::uint8_t> &labels,
-    const std::string &output
-) {
+static void
+save_labeled_data(const Data<NR_FEATURES> &data, const std::vector<std::uint8_t> &labels, const std::string &output) {
     csv::CsvFile output_file;
     output_file.reserve(1 + data.extent(0));
 
