@@ -1,8 +1,8 @@
 #pragma once
 #include <mdspan>
 
-namespace cf
-{
+namespace cf {
+
     template<std::uint8_t nr_features>
     using Data = std::mdspan<double, std::extents<std::uint32_t, std::dynamic_extent, nr_features>>;
 

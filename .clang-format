@@ -29,7 +29,7 @@ BinPackArguments: false
 BinPackParameters: false
 BreakAfterAttributes: Leave
 BreakBeforeBinaryOperators: NonAssignment
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Attach
 BreakInheritanceList: AfterComma
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: true

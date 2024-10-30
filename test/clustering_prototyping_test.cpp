@@ -1,4 +1,4 @@
-#include <algorithm>
+#include <cstddef>
 #include <cstdint>
 #include <print>
 #include <ranges>
@@ -6,23 +6,20 @@
 
 #include "acutest/acutest.h"
 #include "algebra/algebra.h"
-#include "csvcpp/csvcpp.h"
 #include "data_objects/aliases.h"
 #include "epsilon.h"
 #include "gmm_em/gmm_em.h"
-#include "kmeans/kmeans.h"
 
 using namespace cf;
 
-constexpr std::uint8_t NR_COMPONENTS = 5;
 constexpr std::uint8_t NR_FEATURES = 2;
 
+// TODO: port to doctest
 
-void test_e_step(void)
-{
+static void test_e_step(void) {
     std::vector<double> data{1.0, 2.0, 2.0, 1.0, 3.0, 3.0, 6.0, 8.0, 8.0, 6.0, 9.0, 9.0};
 
-    std::vector<double> responsibilities(6 * NR_FEATURES, 0);
+    std::vector<double> responsibilities(static_cast<std::size_t>(6 * NR_FEATURES), 0);
 
     std::vector<double> mixing_coefficients_data{0.5, 0.5};
 
@@ -39,27 +36,24 @@ void test_e_step(void)
 
     gmm::e_step<2, 2>(data_v, responsibilities_v, means, covariances, mixing_coefficients);
 
-    for (auto data_point_index : std::views::iota(0uz, responsibilities_v.extent(0)))
-    {
-        for (auto component_index : std::views::iota(0uz, responsibilities_v.extent(1)))
-        {
+    for (auto data_point_index : std::views::iota(0UZ, responsibilities_v.extent(0))) {
+        for (auto component_index : std::views::iota(0UZ, responsibilities_v.extent(1))) {
             std::print("{} ", responsibilities_v[data_point_index, component_index]);
         }
         std::println("");
     }
 }
 
-void test_m_step(void)
-{
+void test_m_step(void) {
     std::vector<double> data{1.0, 2.0, 1.5, 1.8, 5.0, 8.0, 8.0, 8.0, 1.0, 0.6, 9.0, 11.0};
 
     std::vector<double> responsibilities{0.9, 0.1, 0.8, 0.2, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.9};
 
     std::vector<double> mixing_coefficients_data(2, 0);
 
-    std::vector<double> covariances_data(2 * 2 * 2, 0);
+    std::vector<double> covariances_data(static_cast<std::size_t>(2 * 2 * 2), 0);
 
-    std::vector<double> means_data(2 * 2, 0);
+    std::vector<double> means_data(static_cast<std::size_t>(2 * 2), 0);
 
     auto means = Means<2, 2>(means_data.data());
     auto covariances = Covariances<2, 2>(covariances_data.data());
@@ -72,11 +66,10 @@ void test_m_step(void)
     gmm::pretty_print_result<2, 2>(means, covariances, mixing_coefficients);
 }
 
-void test_log_likelihood(void)
-{
+void test_log_likelihood(void) {
     std::vector<double> data{1.0, 2.0, 2.0, 1.0, 3.0, 4.0};
 
-    std::vector<double> responsibilities(3 * NR_FEATURES, 0);
+    std::vector<double> responsibilities(static_cast<std::size_t>(3 * NR_FEATURES), 0);
 
     std::vector<double> mixing_coefficients_data{0.5, 0.5};
 
@@ -96,8 +89,7 @@ void test_log_likelihood(void)
     std::println("{}", ll);
 }
 
-void test_pdf(void)
-{
+void test_pdf(void) {
     std::vector<double> data{1.0, 2.0};
 
     std::vector<double> covariances_data{1.0, 0.5, 0.5, 1.0};
@@ -109,33 +101,31 @@ void test_pdf(void)
     auto data_v = Data<2>(data.data(), 1);
 
     auto det_covariance = algebra::det<1, 2>(covariances, 0);
-    auto inv_covariance_data = algebra::gaussJordan<1, 2>(covariances, 0);
+    auto inv_covariance_data = algebra::gauss_jordan<1, 2>(covariances, 0);
 
     auto inv_covariance = InvCovarianceMatrix<2>(inv_covariance_data.data());
 
-    const double factor = gmm::norm_factor(2, det_covariance);
-    std::println("norm_factor : {}", factor);
+    const double FACTOR = gmm::norm_factor(2, det_covariance);
+    std::println("norm_factor : {}", FACTOR);
 
-    auto pdf = gmm::gaussian_pdf<1, 2>(data_v, 0, means, 0, inv_covariance, factor);
+    auto pdf = gmm::gaussian_pdf<1, 2>(data_v, 0, means, 0, inv_covariance, FACTOR);
 
     std::println("{}", pdf);
     TEST_CHECK(pdf == 0.024871417406145686);
 }
 
-void TestInvMatrix(void)
-{
+void TestInvMatrix(void) {
     std::vector<double> matrix_data = {4, 7, 2, 6};
 
     std::vector<double> expected_inverse = {0.6, -0.7, -0.2, 0.4};
 
     auto matrix = algebra::ArrayOfQuadraticMatrices<1, 2>(matrix_data.data());
 
-    const auto result = algebra::gaussJordan<1, 2>(matrix, 0);
+    const auto RESULT = algebra::gauss_jordan<1, 2>(matrix, 0);
 
-    TEST_CHECK(expected_inverse.size() == result.size());
-    for (size_t i = 0; i < expected_inverse.size(); ++i)
-    {
-        TEST_CHECK(equal_within_ulps(expected_inverse[i], result[i], 1));
+    TEST_CHECK(expected_inverse.size() == RESULT.size());
+    for (size_t i = 0; i < expected_inverse.size(); ++i) {
+        TEST_CHECK(equal_within_ulps(expected_inverse[i], RESULT[i], 1));
     }
 
     auto covariances_data =
@@ -147,18 +137,15 @@ void TestInvMatrix(void)
 
     auto covariances = algebra::ArrayOfQuadraticMatrices<5, 2>(covariances_data.data());
 
-    for (auto i = 0; i < 5; i++)
-    {
-        auto inv = algebra::gaussJordan<5, 2>(covariances, i);
-        for (auto x : inv)
-        {
+    for (auto i = 0; i < 5; i++) {
+        auto inv = algebra::gauss_jordan<5, 2>(covariances, i);
+        for (auto x : inv) {
             std::println("{}", x);
         }
     }
 }
 
-void TestDetMatrix(void)
-{
+void TestDetMatrix(void) {
     std::vector<double> mat1{1, 2, 3, 4};
     auto matrix1 = algebra::ArrayOfQuadraticMatrices<1, 2>(mat1.data());
     auto det_mat1 = algebra::det<1, 2>(matrix1, 0);
@@ -166,14 +153,14 @@ void TestDetMatrix(void)
     TEST_CHECK(-2.0 == det_mat1);
 
     std::vector<double> mat2{6, 1, 1, 4, -2, 5, 2, 8, 7};
-    auto matrix2 = algebra::ArrayOfQuadraticMatrices<1, 3>(mat1.data());
+    auto matrix2 = algebra::ArrayOfQuadraticMatrices<1, 3>(mat2.data());
     auto det_mat2 = algebra::det<1, 3>(matrix2, 0);
+    std::println("{}", det_mat2);
 
-    TEST_CHECK(-306.0 == det_mat2);
+    TEST_CHECK(equal_within_ulps(-306.0, det_mat2, 1));
 }
 
-void TestComputeCovarianceMatrix(void)
-{
+void TestComputeCovarianceMatrix(void) {
     auto data_data = std::vector<double>{2.5, 2.4, 0.5, 0.7, 2.2, 2.9, 1.9, 2.2, 3.1, 3.0,
                                          2.3, 2.7, 2.0, 1.6, 1.0, 1.1, 1.5, 1.6, 1.1, 0.9};
     auto data = Data<2>(data_data.data(), 10);
@@ -187,18 +174,14 @@ void TestComputeCovarianceMatrix(void)
     auto labels = std::vector<std::uint8_t>(20, 0);
     auto points_in_cluster = std::vector<std::uint32_t>{9};
 
-    for (auto x : std::views::iota(0uz, cov_v.extent(1)))
-    {
-        for (auto y : std::views::iota(0uz, cov_v.extent(2)))
-        {
-            for (auto data_point_index : std::views::iota(0uz, data.extent(0)))
-            {
+    for (auto x : std::views::iota(0UZ, cov_v.extent(1))) {
+        for (auto y : std::views::iota(0UZ, cov_v.extent(2))) {
+            for (auto data_point_index : std::views::iota(0UZ, data.extent(0))) {
                 cov_v[labels.at(data_point_index), x, y] +=
                     (data[data_point_index, x] - centroids[x]) * (data[data_point_index, y] - centroids[y]);
             }
 
-            for (auto component_index : std::views::iota(0uz, cov_v.extent(0)))
-            {
+            for (auto component_index : std::views::iota(0UZ, cov_v.extent(0))) {
                 cov_v[component_index, x, y] /= points_in_cluster[component_index];
             }
         }
@@ -207,15 +190,11 @@ void TestComputeCovarianceMatrix(void)
     double sum = 0;
     double prev = 0;
     auto index = 0;
-    for (auto x : data_data)
-    {
-        if (index == 0)
-        {
+    for (auto x : data_data) {
+        if (index == 0) {
             prev = x - centroids[index];
             index = 1;
-        }
-        else if (index == 1)
-        {
+        } else if (index == 1) {
             sum += (x - centroids[index]) * prev;
             index = 0;
         }

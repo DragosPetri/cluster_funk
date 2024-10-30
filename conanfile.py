@@ -1,44 +1,31 @@
-import os
-from conans import ConanFile, CMake
-
-def version_name():
-    build_version = os.getenv("BUILD_VERSION")
-
-    if build_version == None:
-        return "develop"
-    else:
-        return str(build_version)
+from conan import ConanFile
+from conan.tools.cmake import CMake, cmake_layout
+from conan.tools.files import copy
 
 class ClusterFunk(ConanFile):
     name = "ClusterFunk"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "coverage": [True, False]}
-    default_options = {"shared": False, "coverage": False}
-    generators = "cmake"
+    generators = {"CMakeDeps", "CMakeToolchain"}
     exports_sources = {"CMakeLists.txt", "src/**", "test/**", "config/**"}
     keep_imports = True
 
     def requirements(self):
         pass
 
-    def set_version(self):
-        self.version = version_name()
-        print("set_version:  ", self.version)
-
     def build(self):
         cmake = CMake(self)
-        cmake.configure(source_folder="")
+        cmake.configure()
         cmake.build()
-        cmake.parallel = False
-        cmake.test(output_on_failure=True)
+
+        if not self.conf.get("tools.build:skip_test", check_type=bool):
+            cmake.test()
 
     def package(self):
-        self.copy("*.h", dst="include", src="src")
-        self.copy("*.a", dst="lib", keep_path=False)
+        copy(self, "*.h", dst="include", src="src")
+        copy(self, "*.a", dst="lib", keep_path=False)
 
     def deploy(self):
-        self.copy("*", dst="include", src="include")
-        self.copy("*", dst="lib", src="lib")
+        copy(self, "*", self.package_folder, self.deploy_folder)
 
-    def package_info(self):
-        self.cpp_info.libs = ["lib"]
+    def layout(self):
+        cmake_layout(self, build_folder="build")

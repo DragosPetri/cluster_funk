@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
-#include <type_traits>
 
 template<class T>
-std::enable_if_t<not std::numeric_limits<T>::is_integer, bool> equal_within_ulps(T x, T y, std::size_t n)
+bool equal_within_ulps(T x, T y, std::size_t n)
+    requires(not std::numeric_limits<T>::is_integer)
 {
     // Since `epsilon()` is the gap size (ULP, unit in the last place)
     // of floating-point numbers in interval [1, 2), we can scale it to

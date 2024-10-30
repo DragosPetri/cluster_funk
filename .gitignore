@@ -1,10 +1,12 @@
 .cache/
 .idea/
+.vscode/
+.devcontainer/
+
+compile_commands.json
+CMakeUserPresets.json
+
 build/
 log/
-build-arm/
-.vscode/
-.cache/
 ./test/log
-.devcontainer/
 output/

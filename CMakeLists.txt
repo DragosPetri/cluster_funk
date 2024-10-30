@@ -20,13 +20,6 @@ add_compile_options(
 )
 
 #-------------------------------------------------------------------------------
-# Conan config
-#-------------------------------------------------------------------------------
-
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-
-#-------------------------------------------------------------------------------
 # Add dependencies
 #-------------------------------------------------------------------------------
 
@@ -74,7 +67,6 @@ add_executable(clustering_prototyping_test ${TEST_SOURCES} ${LIB_SOURCES})
 # Include target libraries
 #-------------------------------------------------------------------------------
 
-include(Dart)
 enable_testing()
 set(CMAKE_CTEST_ARGUMENTS "-VV")
 
